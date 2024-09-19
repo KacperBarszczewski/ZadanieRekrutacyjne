@@ -47,6 +47,7 @@ export class TableOfElementsComponent implements OnInit, OnDestroy {
 
     dialogRef.afterClosed().subscribe((result: PeriodicElement | undefined) => {
       if (result) {
+        //Object.assign(row, result);
         Object.keys(result).forEach((key) => {
           const typeKey = key as keyof PeriodicElement;
 
