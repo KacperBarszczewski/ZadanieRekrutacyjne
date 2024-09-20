@@ -1,7 +1,10 @@
 <div class="table-container">
 
   @if(this.dataSource.data.length === 0) {
-  <mat-spinner></mat-spinner>
+  <div class="spinner-container">
+    <mat-spinner diameter="40" strokeWidth="3"></mat-spinner>
+  </div>
+
   }@else {
   <mat-form-field>
     <mat-label>Search</mat-label>

@@ -1,6 +1,13 @@
 .table-container {
     margin-top: 20px;
     width: 50vw;
+
+    .spinner-container {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 .mat-mdc-row .mat-mdc-cell {
@@ -16,6 +23,7 @@
 @media (max-width: 500px) {
     .table-container {
         width: 80vw;
+
         table {
             width: 100%;
             display: block;
