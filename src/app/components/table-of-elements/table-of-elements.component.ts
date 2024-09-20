@@ -43,7 +43,8 @@ export class TableOfElementsComponent implements OnInit, OnDestroy {
   }
 
   openDialog(row: PeriodicElement) {
-    const dialogRef = this.dialog.open(EditElementPopupComponent, { data: { ...row } });
+    const dialogRef = this.dialog.open(EditElementPopupComponent, {  height: '300px',
+      width: '80vw', data: { ...row } });
 
     dialogRef.afterClosed().subscribe((result: PeriodicElement | undefined) => {
       if (result) {
