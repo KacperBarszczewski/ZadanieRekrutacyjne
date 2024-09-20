@@ -26,8 +26,6 @@ const ELEMENT_DATA: PeriodicElement[] = [
 })
 export class PeriodicElementService {
 
-  constructor() { }
-
   getElements(): Observable<PeriodicElement[]> {
     return of(ELEMENT_DATA).pipe(delay(2000));;
   }

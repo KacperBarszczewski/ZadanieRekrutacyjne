@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { PeriodicElement, PeriodicElementService } from '../../services/periodic-element.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -7,46 +7,46 @@ import { MatDialog } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject, tap } from 'rxjs';
+import { RxState } from '@rx-angular/state';
 
 @Component({
   selector: 'table-of-elements',
   standalone: true,
   imports: [MatTableModule, MatProgressSpinnerModule, EditElementPopupComponent, FormsModule, MatFormFieldModule, MatInputModule],
   templateUrl: './table-of-elements.component.html',
-  styleUrl: './table-of-elements.component.scss'
+  styleUrl: './table-of-elements.component.scss',
+  providers: [RxState]
 })
-export class TableOfElementsComponent implements OnInit, OnDestroy {
+export class TableOfElementsComponent implements OnInit {
+
   displayedColumns: string[] = ['position', 'name', 'weight', 'symbol'];
-  dataSource: MatTableDataSource<PeriodicElement> = new MatTableDataSource<PeriodicElement>([]);
+  dataSource: MatTableDataSource<PeriodicElement> = new MatTableDataSource<PeriodicElement>();
+  filterSubject: Subject<string> = new Subject<string>();
   readonly dialog = inject(MatDialog);
-  private filterSubject: Subject<string> = new Subject<string>();
+  readonly state = inject(RxState<TableOfElementsComponent>);
 
   constructor(private elementService: PeriodicElementService) { }
 
   ngOnInit(): void {
-    this.elementService.getElements().subscribe(data => {
-      this.dataSource = new MatTableDataSource(data);
-    });
+    this.state.connect('dataSource', this.elementService.getElements().pipe(
+      tap(data => this.dataSource = new MatTableDataSource(data))
+    ));
 
-    this.filterSubject.pipe(
-      debounceTime(2000)
-    ).subscribe(filterValue => {
-      this.dataSource.filter = filterValue.trim().toLowerCase();
-    });
-  }
-
-  ngOnDestroy(): void {
-    if (this.filterSubject) {
-      this.filterSubject.unsubscribe();
-    }
+    this.state.connect('filter', this.filterSubject.pipe(
+      debounceTime(2000),
+      tap(filterValue => this.dataSource.filter = filterValue.trim().toLowerCase())
+    ));
   }
 
   openDialog(row: PeriodicElement) {
-    const dialogRef = this.dialog.open(EditElementPopupComponent, {  height: '300px',
-      width: '80vw', data: { ...row } });
+    const dialogRef = this.dialog.open(EditElementPopupComponent, {
+      height: '300px',
+      width: '80vw',
+      data: { ...row }
+    });
 
-    dialogRef.afterClosed().subscribe((result: PeriodicElement | undefined) => {
+    this.state.hold(dialogRef.afterClosed(), (result: PeriodicElement | undefined) => {
       if (result) {
         //Object.assign(row, result);
         Object.keys(result).forEach((key) => {
@@ -58,6 +58,7 @@ export class TableOfElementsComponent implements OnInit, OnDestroy {
         })
       }
     });
+
   }
 
   applyFilter(event: Event) {
