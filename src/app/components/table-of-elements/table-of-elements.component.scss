@@ -1,9 +1,5 @@
 .table-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    height: 100%;
+    margin-top: 20px;
     width: 50vw;
 }
 
@@ -15,4 +11,15 @@
 
 .mat-mdc-row:hover .mat-mdc-cell {
     border-color: currentColor;
+}
+
+@media (max-width: 500px) {
+    .table-container {
+        width: 80vw;
+        table {
+            width: 100%;
+            display: block;
+            overflow-x: auto;
+        }
+    }
 }
